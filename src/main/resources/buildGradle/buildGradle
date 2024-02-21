@@ -1,0 +1,102 @@
+buildscript {
+    repositories {
+        maven {
+            url "https://couriers-qa.repo.russianpost.ru/release"
+        }
+        maven {
+            url 'https://maven.repo.russianpost.ru/maven/'
+        }
+    }
+    dependencies {
+        classpath "dev.shawen.plugins.commons:shawen-autotest-generator:1.0.0"
+        classpath "io.qameta.allure.gradle.allure:allure-plugin:2.9.6"
+        classpath "org.springframework.boot:spring-boot-gradle-plugin:2.6.3"
+        classpath "io.spring.gradle:dependency-management-plugin:1.0.10.RELEASE"
+        classpath "ru.russianpost.couriers.qa:allure-server-gradle:2.0.1"
+    }
+}
+
+apply plugin: 'java'
+apply plugin: 'shawen-autotest-generator'
+apply plugin: "io.qameta.allure"
+apply plugin: "org.springframework.boot"
+apply plugin: "io.spring.dependency-management"
+apply plugin: "ru.russianpost.couriers.qa.allure"
+
+allure {
+    version = '2.14.0'
+}
+
+group 'ru.russianpost'
+version '1.0.0'
+
+
+def env = project.hasProperty("profile") ? property("profile").toLowerCase() : "develop"
+
+apply from: "allure.gradle"
+
+repositories {
+    maven {
+        url 'https://maven.repo.russianpost.ru/maven/'
+    }
+}
+
+configurations {
+    all*.exclude module: 'spring-boot-starter-logging'
+    all*.exclude module: 'logback-classic'
+}
+
+dependencies {
+    implementation group: 'org.jsoup', name: 'jsoup', version: '1.14.3'
+    implementation group: 'com.google.guava', name: 'guava', version: '20.0'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+}
+
+generator {
+//Folder with swagger spec
+    specToGenerate = "spec"
+
+//Utils classes for test (default "false")
+    utils = true
+
+//Class with beans client
+    testConfig = "/src/main/java/app/config/AppConfig.java"
+
+////Parameter to download swagger spec (using only with "pathToSaveSpec")
+//    download = [""]
+//
+////Parameter to save download swagger spec
+//    pathToSaveSpec = "spec"
+}
+
+test {
+    ignoreFailures = true
+    testLogging.showStandardStreams = true
+    maxHeapSize = "1024m"
+    //Параллельный запуск тестов
+//    maxParallelForks = Runtime.runtime.availableProcessors()
+//    scanForTestClasses = false
+//    systemProperty("junit.jupiter.execution.parallel.enabled", "true")
+//    systemProperty("junit.jupiter.execution.parallel.mode.default", "concurrent")
+//    systemProperty("junit.jupiter.execution.parallel.mode.classes.default", "same_thread")
+    systemProperty("junit.jupiter.extensions.autodetection.enabled", "true")
+    useJUnitPlatform {
+        if (project.hasProperty("tag")) {
+            def listTag = "$tag".split(',').collect { it as String }
+            listTag.each {
+                includeTags "${it}"
+            }
+        }
+    }
+    systemProperty 'spring.profiles.active', "${env}"
+    doLast {
+        String pathToProperties = "${buildDir}/allure-results/environment.properties"
+        new File(pathToProperties).delete()
+        File file = new File(pathToProperties)
+        file.append("TEST-STAND=${env}".toUpperCase())
+    }
+}

@@ -1,0 +1,21 @@
+package ru.russianpost.testcases;
+
+import io.qameta.allure.Description;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import ru.russianpost.utils.TestBase;
+import org.junit.jupiter.api.Tag;
+
+import java.util.UUID;
+
+import static org.apache.http.HttpStatus.SC_BAD_REQUEST;
+import static org.apache.http.HttpStatus.SC_OK;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.*;
+import static sw.generator.client.util.ResponseSpecBuilders.shouldBeCode;
+import static sw.generator.client.util.ResponseSpecBuilders.validatedWith;
+
+@Tag("")
+public class ExampleTest extends TestBase {
+
+}

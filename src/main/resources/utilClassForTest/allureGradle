@@ -1,0 +1,46 @@
+def allureUrl = project.hasProperty("allureServer") ? property("allureServer") : "none"
+def userAllure = project.hasProperty("userAllure") ? property("userAllure") : "none"
+def passwordAllure = project.hasProperty("passwordAllure") ? property("passwordAllure") : "none"
+
+allureServer {
+    resultDirs = [file("$buildDir/allure-results")]
+    allureServerUrl = "${allureUrl}"
+    allureUser = "${userAllure}"
+    allurePassword = "${passwordAllure}"
+    def branchName = System.getenv("CI_COMMIT_BRANCH")
+    def buildName = System.getenv("CI_JOB_ID")
+    def buildUrl = System.getenv("CI_JOB_URL")
+    def ciJobName = System.getenv("CI_JOB_NAME")
+    def tagName = ""
+    if (ciJobName == "TAG") {
+        tagName = "$tag"
+    }
+
+    requestToGeneration = { uuid ->
+        """
+{
+  "reportSpec": {
+    "path": [ "$project.name", "$branchName", "$ciJobName", "$tagName"],
+    "executorInfo": {
+      "name": "GitLab CI",
+      "type": "GitLab CI",
+      "buildName": "$buildName",
+      "buildUrl": "$buildUrl",
+      "reportName": "$project.name"
+    }
+  },
+  "results": [ "$uuid" ],
+  "deleteResults": true
+}"""
+    }
+}
+
+allureServerSend {
+    allureUser = "${userAllure}"
+    allurePassword = "${passwordAllure}"
+}
+
+allureServerGenerate {
+    allureUser = "${userAllure}"
+    allurePassword = "${passwordAllure}"
+}

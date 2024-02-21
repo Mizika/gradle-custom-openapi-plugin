@@ -1,0 +1,8 @@
+package app.config.model;
+
+import lombok.Data;
+
+@Data
+public class Url {
+    private String testUrl;
+}

@@ -1,0 +1,3 @@
+allure.results.directory=build/allure-results
+allure.link.issue.pattern=https://jira.russianpost.ru/browse/{}
+allure.link.tms.pattern=https://testrail.tools.russianpost.ru/index.php?/cases/view/{}

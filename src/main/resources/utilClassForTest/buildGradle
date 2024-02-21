@@ -1,0 +1,42 @@
+buildscript {
+    repositories {
+        mavenLocal()
+        maven {
+            url 'https://maven.repo.russianpost.ru/maven/'
+        }
+    }
+    dependencies {
+        classpath 'ru.post:shawen-autotest-generator:1.0.0'
+        classpath "io.qameta.allure.gradle.allure:allure-plugin:2.9.6"
+    }
+}
+
+
+plugins {
+    id 'java'
+}
+
+apply plugin: 'ru.post.shawen-autotest-generator'
+apply plugin: "io.qameta.allure"
+
+group 'org.example'
+version '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+allure {
+    version = '2.14.0'
+}
+
+dependencies {}
+
+generator{
+    pathToSpec = "swaggerSpec"
+    generateTest = false
+}
+
+test {
+    useJUnitPlatform()
+}

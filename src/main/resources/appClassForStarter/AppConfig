@@ -1,0 +1,33 @@
+package app.config;
+
+import com.github.javafaker.Faker;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Scope;
+
+import java.util.Locale;
+
+import static api.generator.utils.Clients.getSpecBuilder;
+
+@Configuration
+@EnableConfigurationProperties
+@ComponentScan(basePackages = {"app.config", "helpers"})
+public class AppConfig {
+
+    @Autowired
+    TestConfig testConfig;
+
+    @Bean(name = "faker")
+    Faker faker() {
+        return new Faker();
+    }
+
+    @Bean(name = "ruFaker")
+    Faker ruFaker() {
+        return new Faker(new Locale("ru_RU"));
+    }
+
+}
