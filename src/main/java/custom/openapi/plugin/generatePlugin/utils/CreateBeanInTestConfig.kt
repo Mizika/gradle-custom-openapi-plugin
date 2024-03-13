@@ -44,7 +44,7 @@ class CreateBeanInTestConfig {
                             "import org.junit.jupiter.api.BeforeAll;\n" +
                             "import static io.restassured.RestAssured.config;\n" +
                             "import static io.restassured.config.ObjectMapperConfig.objectMapperConfig;\n" +
-                            "import static sw.generator.client.utils.JacksonObjectMapper.jackson;\n" +
+                            "import static custom.generator.utils.JacksonObjectMapper.jackson;\n" +
                             "======================================================================================\n")
                 }
                 apiFile.forEachLine { line ->
@@ -65,7 +65,7 @@ class CreateBeanInTestConfig {
                 "    @Bean\n" +
                 "    @Scope(\"prototype\")\n" +
                 "    public $classname $methodName() {\n" +
-                "        return $classname.$clientName(() -> getSpecBuilder(testConfig.getUrl().getTestUrl()));\n" +
+                "        return $classname.$clientName(() -> getSpecBuilder(\"PASTE YOUR URL HERE\"));\n" +
                 "    }"
     }
 
@@ -97,7 +97,7 @@ class CreateBeanInTestConfig {
 
     private fun addImport(testConfigPath: String, apiFile: File) {
         val testConfig = File(testConfigPath)
-        val import = apiFile.path.replaceBefore("sw", "")
+        val import = apiFile.path.replaceBefore("custom", "")
             .replace("/", ".")
             .replace("\\", ".")
             .substringBeforeLast(".")

@@ -25,7 +25,7 @@ open class OpenApiConfig @Inject constructor(
         globalProperties.put("apis", "")
         globalProperties.put("models", "")
         skipValidateSpec.set(true)
-        groupId.set("sw.generator")
+        groupId.set("custom.generator")
         id.set("client")
         generateModelTests.set(false)
         generateApiTests.set(false)

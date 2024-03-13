@@ -29,32 +29,51 @@ class DoLastInCreationTask {
      */
     fun doLastInCreationTask(spec: File, extensions: Extensions, pathToProject: String) {
         val nameFile = spec.name.substringBefore(".")
+        val nameSpecUpper = nameFile.uppercase(Locale.getDefault())
+        val nameSpecLower = nameFile.lowercase(Locale.getDefault())
         val basePackage = Constants.GeneratorPlugin.BASE_PACKAGE
         val pathToApiClient = pathToProject +
-                "/src/main/java/${basePackage.replace(".", "/")}/${nameFile.lowercase(Locale.getDefault())}/api"
+                "/src/main/java/${basePackage.replace(".", "/")}/${nameSpecLower}/api"
         val pathToClientHelper = pathToProject + "/src/main/java/${
             basePackage.replace(
                 ".",
                 "/"
             )
-        }/${nameFile.lowercase(Locale.getDefault())}/${nameFile}CallingGeneratedClients"
+        }/${nameSpecLower}/${nameFile}CallingGeneratedClients"
+        println("===============")
+        println("Rename api client for \"${nameSpecUpper}\" path \"${pathToApiClient}\"")
         RenameGenerateFiles().renameApiClient(pathToApiClient)
-        CreateUtilClassForGeneratedModelAndClient().createUtils(pathToProject)
+        println("Rename api client end success!")
+        println("===============")
+        if (extensions.utils) {
+            println("Create utils class \"${nameSpecUpper}\" path \"${pathToProject}\"")
+            CreateUtilClassForGeneratedModelAndClient().createUtils(pathToProject)
+            println("Create utils class end success!")
+        }
         if (extensions.testConfig.isNotBlank()) {
+            println("===============")
+            println("Create bean for \"${nameSpecUpper}\" path \"${pathToProject + extensions.testConfig}\"")
             CreateBeanInTestConfig().createBeanInTestConfig(
                 pathToApiClient,
                 pathToProject + extensions.testConfig
             )
+            println("Create bean end success!")
         } else {
+            println("===============")
+            println("Create helpers to call client for \"${nameSpecUpper}\" path: \"${pathToClientHelper}\"")
             CreateBeanInTestConfig().createBeanHelper(pathToApiClient, pathToClientHelper)
+            println("Create helpers to call client end success!")
         }
         if (extensions.helpers.isNotBlank()) {
+            println("===============")
+            println("Create class helper with call methods for \"${nameSpecUpper}\"")
             CreateHelpersClass().createHelpers(
                 spec = spec,
                 nameFile = nameFile,
                 pathToProject = pathToProject,
                 pathToFolder = extensions.helpers
             )
+            println("Create class helper with call methods end success!")
         }
     }
 }
