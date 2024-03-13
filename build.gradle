@@ -4,9 +4,13 @@ buildscript {
     }
     repositories {
         mavenCentral()
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
     }
     dependencies {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.8.20"
+        classpath "com.gradle.publish:plugin-publish-plugin:1.2.1"
     }
 }
 
@@ -14,12 +18,16 @@ apply plugin: 'maven-publish'
 apply plugin: 'java'
 apply plugin: 'java-gradle-plugin'
 apply plugin: "org.jetbrains.kotlin.jvm"
+apply plugin: "com.gradle.plugin-publish"
 
 group 'custom.openapi.plugin'
 version '1.0.0'
 
 repositories {
     mavenCentral()
+    maven {
+        url "https://plugins.gradle.org/m2/"
+    }
 }
 
 dependencies {
@@ -33,6 +41,20 @@ dependencies {
 
 test {
     useJUnitPlatform()
+}
+
+gradlePlugin {
+    website = 'https://github.com/Mizika/gradle-custom-openapi-plugin'
+    vcsUrl = 'https://github.com/Mizika/gradle-custom-openapi-plugin'
+    plugins {
+        openApiCustomGenerator {
+            id = 'custom.openapi.plugin'
+            implementationClass = 'custom.openapi.plugin.Plugin'
+            displayName = 'Gradle Custom OpenApi plugin'
+            description = 'Gradle plugin to generate client model'
+            tags.set(['openapi', 'custom', 'generator'])
+        }
+    }
 }
 
 publishing {
