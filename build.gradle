@@ -1,6 +1,6 @@
 buildscript {
     ext {
-        openapiGenerator = '7.3.0'
+        openapiGenerator = '7.7.0'
     }
     repositories {
         mavenCentral()

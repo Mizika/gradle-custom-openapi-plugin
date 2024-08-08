@@ -20,6 +20,7 @@ open class OpenApiConfig @Inject constructor(
         generateApiDocumentation.set(false)
         configOptions.put("dateLibrary", "java8")
         configOptions.put("serializationLibrary", "jackson")
+        configOptions.put("useOneOfInterfaces", "true")
         typeMappings.put("OffsetDateTime", "String")
         globalProperties.put("docs", "false")
         globalProperties.put("apis", "")
@@ -35,6 +36,7 @@ open class OpenApiConfig @Inject constructor(
         modelPackage.set("${basePackage}.${nameFile.lowercase(Locale.getDefault())}.model")
         additionalProperties.put("productName", nameFile.lowercase(Locale.getDefault()).capitalize())
         templateDir.set(extensions.templateDir)
+        openapiNormalizer.put("REF_AS_PARENT_IN_ALLOF", "true")
     }
 
 }
