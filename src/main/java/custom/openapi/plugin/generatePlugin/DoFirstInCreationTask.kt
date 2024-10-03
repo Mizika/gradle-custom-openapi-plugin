@@ -2,9 +2,7 @@ package custom.openapi.plugin.generatePlugin
 
 import custom.openapi.plugin.Constants
 import custom.openapi.plugin.Extensions
-import custom.openapi.plugin.generatePlugin.utils.CreateTemplates
-import custom.openapi.plugin.generatePlugin.utils.DeleteApiTag
-import custom.openapi.plugin.generatePlugin.utils.DeleteDeprecatedMethod
+import custom.openapi.plugin.generatePlugin.utils.*
 import java.io.File
 import java.util.*
 
@@ -32,6 +30,12 @@ class DoFirstInCreationTask {
         }
         if (extensions.deleteDeprecatedMethod) {
             DeleteDeprecatedMethod().deleteDeprecatedMethod(spec = spec)
+        }
+        if (extensions.deleteReadOnlyParam) {
+            DeleteReadOnlyParam().deleteReadOnlyParam(spec = spec)
+        }
+        if (extensions.deleteWriteOnlyParam) {
+            DeleteWriteOnlyParam().deleteWriteOnlyParam(spec = spec)
         }
         val nameFile = spec.name.substringBefore(".")
         val basePackage = Constants.GeneratorPlugin.BASE_PACKAGE

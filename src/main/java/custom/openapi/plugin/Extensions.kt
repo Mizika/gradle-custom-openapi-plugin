@@ -42,5 +42,15 @@ open class Extensions {
      */
     open var templateDir: String = ""
 
+    /**
+     * Параметр для удаления атрибутов readOnly из swagger спецификации
+     */
+    open var deleteReadOnlyParam: Boolean = false
+
+    /**
+     * Параметр для удаления атрибутов writeOnly из swagger спецификации
+     */
+    open var deleteWriteOnlyParam: Boolean = false
+
 
 }
