@@ -1,19 +1,75 @@
-plugins {
-    id 'java'
+buildscript {
+    ext {
+        openapiGenerator = '7.8.0'
+    }
+    repositories {
+        mavenCentral()
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
+    }
+    dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.8.20"
+        classpath "com.gradle.publish:plugin-publish-plugin:1.2.1"
+    }
 }
 
-group 'org.example'
-version '1.0-SNAPSHOT'
+apply plugin: 'maven-publish'
+apply plugin: 'java'
+apply plugin: 'java-gradle-plugin'
+apply plugin: "org.jetbrains.kotlin.jvm"
+apply plugin: "com.gradle.plugin-publish"
+
+group 'custom.openapi.plugin'
+version '1.0.0'
 
 repositories {
     mavenCentral()
+    maven {
+        url "https://plugins.gradle.org/m2/"
+    }
 }
 
 dependencies {
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
+    implementation(
+            "org.openapitools:openapi-generator-gradle-plugin:$openapiGenerator",
+            "org.openapitools:openapi-generator:$openapiGenerator",
+            "org.jetbrains.kotlin:kotlin-stdlib",
+            "com.google.code.gson:gson:2.10.1"
+    )
 }
 
 test {
     useJUnitPlatform()
+}
+
+gradlePlugin {
+    website = 'https://github.com/Mizika/gradle-custom-openapi-plugin'
+    vcsUrl = 'https://github.com/Mizika/gradle-custom-openapi-plugin'
+    plugins {
+        openApiCustomGenerator {
+            id = 'custom.openapi.plugin'
+            implementationClass = 'custom.openapi.plugin.Plugin'
+            displayName = 'Gradle Custom OpenApi plugin'
+            description = 'Gradle plugin to generate client model'
+            tags.set(['openapi', 'custom', 'generator'])
+        }
+    }
+}
+
+publishing {
+    repositories {
+        def releaseRepo = "https://maven.repo.test/releases/"
+        def snapshotRepo = "https://maven.repo.test/snapshot/"
+        def deploymentUsername = "test-user"
+        def deploymentPassword = "12345"
+        def repo = (rootProject.version as String).contains('SNAPSHOT') ? snapshotRepo : releaseRepo
+        maven {
+            url "$repo"
+            credentials {
+                username "$deploymentUsername"
+                password "$deploymentPassword"
+            }
+        }
+    }
 }

@@ -1,0 +1,14 @@
+logging:
+  level:
+    org.springframework: ERROR
+    root: ERROR
+
+spring:
+  profiles:
+    active: develop
+  main:
+    banner-mode: off
+
+test:
+  url:
+    testUrl: ${endpoint.testUrl}

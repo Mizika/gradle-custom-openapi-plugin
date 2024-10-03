@@ -1,0 +1,91 @@
+stages:
+  - test
+  - build
+
+before_script:
+  - |
+    export GRADLE_USER_HOME=`pwd`/.gradle
+    curl -s -L http://cert.tools.russianpost.ru/Russian-post-RootCA.crt -o /usr/local/share/ca-certificates/Russian-post-RootCA.crt
+    curl -s -L http://cert.tools.russianpost.ru/Russian-post-Issuing-EntCA-main.crt -o /usr/local/share/ca-certificates/Russian-post-Issuing-EntCA-main.crt
+    update-ca-certificates
+    $JAVA_HOME/bin/keytool -import -alias Russian-post-RootCA1 -keystore $JAVA_HOME/lib/security/cacerts -file /usr/local/share/ca-certificates/Russian-post-RootCA.crt -storepass changeit -noprompt
+    $JAVA_HOME/bin/keytool -import -alias Russian-post-Issuing-EntCA-main1 -keystore $JAVA_HOME/lib/security/cacerts -file /usr/local/share/ca-certificates/Russian-post-Issuing-EntCA-main.crt -storepass changeit -noprompt
+
+variables:
+  GRADLE_OPTS: "-Dorg.gradle.daemon=false -Dorg.gradle.parallel=true -Dorg.gradle.jvmargs=-Xmx4g"
+  ALLURE_SERVER: "https://allure.shawenhub-dev.test.russianpost.ru"
+  ALLURE_USER: "user"
+  ALLURE_PASSWORD: "password"
+  ENVIRONMENT: ""
+  TAG: ""
+
+.cache: &cache
+  key:
+    files:
+      - build.gradle
+  paths:
+    - .gradle/caches
+
+.test-template:
+  stage: test
+  tags:
+    - docker-only
+  image: "docker-registry.tools.russianpost.ru:10443/gradle:6.9.0-jdk11"
+  artifacts:
+    name: "TEST-REPORTS-$CI_PROJECT_PATH_SLUG-$CI_PIPELINE_IID"
+    expire_in: 5 days
+    when: always
+    paths:
+      - build/allure-results
+      - swagger-coverage-output
+    reports:
+      junit: "build/test-results/test/TEST-*.xml"
+  cache:
+    <<: *cache
+
+#Run all tests in package ru.russianpost.testcases
+REGRESSION:
+  when: manual
+  extends: .test-template
+  script:
+    - |
+      echo -e "\e[1m\e[33m=========================================="
+      echo -e "\e[1m\e[33mALL TESTS HAVE BEEN STARTED!"
+      echo -e "\e[1m\e[33mTEST-STEND: ${ENVIRONMENT}"
+      echo -e "\e[1m\e[33m=========================================="
+    - gradle clean test --tests "ru.russianpost.testcases.*" -Pprofile=$ENVIRONMENT -PallureServer="${ALLURE_SERVER}" -PuserAllure="${ALLURE_USER}" -PpasswordAllure="${ALLURE_PASSWORD}" allureServerGenerate
+
+#Started test by tag
+TAG:
+  when: manual
+  extends: .test-template
+  script:
+    - |
+      echo -e "\e[1m\e[33m=========================================="
+      echo -e "\e[1m\e[33mTESTS WITH TAG !!! "${TAG}" !!! HAVE BEEN STARTED!"
+      echo -e "\e[1m\e[33mTEST-STEND: ${ENVIRONMENT}"
+      echo -e "\e[1m\e[33m=========================================="
+    - gradle test --tests "ru.russianpost.testcases.*" -Ptag="${TAG}" -Pprofile=$ENVIRONMENT -PallureServer="${ALLURE_SERVER}" -PuserAllure="${ALLURE_USER}" -PpasswordAllure="${ALLURE_PASSWORD}" allureServerGenerate
+  variables:
+    PATH_POSTFIX: "$TAG"
+
+#Started SMOKE test
+SMOKE:
+  extends: .test-template
+  script:
+    - |
+      echo -e "\e[1m\e[33m=========================================="
+      echo -e "\e[1m\e[33mSMOKE TESTS HAVE BEEN STARTED!"
+      echo -e "\e[1m\e[33mTEST-STEND: ${ENVIRONMENT}"
+      echo -e "\e[1m\e[33m=========================================="
+    - gradle test --tests "ru.russianpost.testcases.*" -Pprofile=$ENVIRONMENT -Ptag="SMOKE" -PallureServer="${ALLURE_SERVER}" -PuserAllure="${ALLURE_USER}" -PpasswordAllure="${ALLURE_PASSWORD}" allureServerGenerate
+  only:
+    - schedules
+
+gradle-build-merge:
+  extends: .test-template
+  script: gradle build -x test
+  only:
+    - merge_requests
+  cache:
+    <<: *cache
