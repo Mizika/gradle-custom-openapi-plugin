@@ -38,6 +38,11 @@ open class Extensions {
     open var deleteDeprecatedMethod: Boolean = true
 
     /**
+     * Параметр для испправления имени имплементируемого DTO
+     */
+    open var fixXImplementation: Boolean = true
+
+    /**
      * Параметр для указания пути темплейтов для генерации клиентов моделей
      */
     open var templateDir: String = ""

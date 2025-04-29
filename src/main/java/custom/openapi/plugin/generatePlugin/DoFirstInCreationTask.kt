@@ -37,6 +37,10 @@ class DoFirstInCreationTask {
         if (extensions.deleteWriteOnlyParam) {
             DeleteWriteOnlyParam().deleteWriteOnlyParam(spec = spec)
         }
+        if (extensions.fixXImplementation) {
+            FixXImplementsDto().removeDtoSuffix(spec = spec)
+        }
+
         val nameFile = spec.name.substringBefore(".")
         val basePackage = Constants.GeneratorPlugin.BASE_PACKAGE
         val pathToApiClient = pathToProject +
