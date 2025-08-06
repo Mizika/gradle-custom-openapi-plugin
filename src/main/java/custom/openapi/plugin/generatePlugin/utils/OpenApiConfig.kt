@@ -21,6 +21,7 @@ open class OpenApiConfig @Inject constructor(
         configOptions.put("dateLibrary", "java8")
         configOptions.put("serializationLibrary", "jackson")
         configOptions.put("useOneOfInterfaces", "true")
+        configOptions.put("hideGenerationTimestamp", "true") // это отключает генерацию даты в аннотаци @javax.annotation.Generated в моделях
         typeMappings.put("OffsetDateTime", "String")
         globalProperties.put("docs", "false")
         globalProperties.put("apis", "")
