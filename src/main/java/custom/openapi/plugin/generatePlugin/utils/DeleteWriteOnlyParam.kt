@@ -10,31 +10,11 @@ import java.io.File
 class DeleteWriteOnlyParam {
 
     fun deleteWriteOnlyParam(spec: File) {
-        val openAPI = OpenAPIV3Parser().read(spec.path)
-        println("====Start delete writeOnly in property====")
-        openAPI.components?.schemas?.forEach { (modelName, schema) ->
-            // Создаем копию свойств, чтобы избежать ConcurrentModificationException при удалении
-            val propertiesCopy = schema.properties?.toMutableMap()
-            propertiesCopy?.forEach { (propertyName, propertySchema) ->
-                // Проверяем, установлен ли атрибут writeOnly
-                if (propertySchema.writeOnly != null) {
-                    propertySchema.writeOnly = null
-                    println("Removed writeOnly attribute for property \"$propertyName\" in model \"$modelName\"")
-                }
-            }
-            // Также нужно проверить свойства внутри allOf
-            schema.allOf?.forEach { subschema ->
-                subschema?.properties?.toMutableMap()?.forEach { (propertyName, propertySchema) ->
-                    if (propertySchema.writeOnly != null) {
-                        propertySchema.writeOnly = null
-                        println("Removed writeOnly attribute for property \"$propertyName\" in allOf model \"$modelName\"")
-                    }
-                }
-            }
+        println("====Start delete writeOnly in property (text mode)====")
+        val cleanedLines = spec.readLines().filterNot { line ->
+            line.trimStart().startsWith("writeOnly:")
         }
-        spec.writeText(
-            io.swagger.v3.core.util.Yaml.mapper().writeValueAsString(openAPI)
-        )
+        spec.writeText(cleanedLines.joinToString("\n") + "\n")
         println("====End delete writeOnly====")
     }
 

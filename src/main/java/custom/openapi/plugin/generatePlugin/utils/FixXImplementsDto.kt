@@ -7,34 +7,29 @@ import io.swagger.v3.core.util.Yaml
 class FixXImplementsDto {
 
     fun removeDtoSuffix(spec: File) {
-        val openAPI = OpenAPIV3Parser().read(spec.path)
-        println("==== Start fixing x-implements Dto suffix ====")
+        println("==== Start fixing x-implements Dto suffix (text mode) ====")
 
+        val lines = spec.readLines().toMutableList()
+        val result = mutableListOf<String>()
         var modified = false
 
-        openAPI.components?.schemas?.forEach { (modelName, schema) ->
-            val extensions = schema.extensions ?: return@forEach
-            val original = extensions["x-implements"] as? List<*> ?: return@forEach
-
-            val updated = original.mapNotNull { entry ->
-                (entry as? String)?.let { name ->
-                    if (name.endsWith("Dto")) {
-                        val newName = name.removeSuffix("Dto")
-                        println("Updated in $modelName: $name -> $newName")
-                        modified = true
-                        newName
-                    } else name
+        for (line in lines) {
+            if (line.trimStart().startsWith("- ") && line.contains("Dto")) {
+                val updatedLine = line.replace(Regex("(\\w+)Dto")) {
+                    val original = it.value
+                    val newName = original.removeSuffix("Dto")
+                    println("Updated: $original -> $newName")
+                    modified = true
+                    newName
                 }
-            }
-
-            if (updated != original) {
-                extensions["x-implements"] = updated
-                schema.extensions = extensions
+                result.add(updatedLine)
+            } else {
+                result.add(line)
             }
         }
 
         if (modified) {
-            spec.writeText(Yaml.mapper().writeValueAsString(openAPI))
+            spec.writeText(result.joinToString("\n") + "\n")
             println("==== Saved updated spec ====")
         } else {
             println("==== No x-implements with Dto suffix found ====")
