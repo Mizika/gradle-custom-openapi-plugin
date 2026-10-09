@@ -7,7 +7,8 @@ import custom.openapi.plugin.generatePlugin.DoLastInCreationTask
 import custom.openapi.plugin.generatePlugin.ExecutionBeforeCreation
 import custom.openapi.plugin.generatePlugin.utils.Download
 import custom.openapi.plugin.generatePlugin.utils.FindSpecificationFiles
-import custom.openapi.plugin.generatePlugin.utils.OpenApiConfig
+import custom.openapi.plugin.generatePlugin.utils.OpenApiTaskConfigurator
+import org.openapitools.generator.gradle.plugin.tasks.GenerateTask
 
 class Plugin : Plugin<Project> {
 
@@ -24,14 +25,15 @@ class Plugin : Plugin<Project> {
                 .forEach { spec ->
                     project.tasks.register(
                         "generate${spec.name.substringBefore(".").capitalize()}",
-                        OpenApiConfig::class.java
+                        GenerateTask::class.java
                     ) { task ->
-                        task.parameters(
-                            spec = spec,
-                            basePackage = Constants.GeneratorPlugin.BASE_PACKAGE,
-                            pathToProject,
-                            extensions
-                        )
+                        OpenApiTaskConfigurator()
+                            .configure(
+                                task = task,
+                                spec = spec,
+                                pathToProject = pathToProject,
+                                extensions = extensions
+                            )
                         task.doFirst {
                             DoFirstInCreationTask().doFirstInCreationTask(
                                 spec = spec,
@@ -43,7 +45,7 @@ class Plugin : Plugin<Project> {
                             DoLastInCreationTask().doLastInCreationTask(
                                 spec = spec,
                                 extensions = extensions,
-                                pathToProject
+                                pathToProject = pathToProject
                             )
                         }
                         task.group = "openapi plugin"

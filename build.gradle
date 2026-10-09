@@ -1,6 +1,6 @@
 buildscript {
     ext {
-        openapiGenerator = '7.14.0'
+        openapiGenerator = '7.26.0'
     }
     repositories {
         mavenCentral()
@@ -43,19 +43,19 @@ test {
     useJUnitPlatform()
 }
 
-gradlePlugin {
-    website = 'https://github.com/Mizika/gradle-custom-openapi-plugin'
-    vcsUrl = 'https://github.com/Mizika/gradle-custom-openapi-plugin'
-    plugins {
-        openApiCustomGenerator {
-            id = 'custom.openapi.plugin'
-            implementationClass = 'custom.openapi.plugin.Plugin'
-            displayName = 'Gradle Custom OpenApi plugin'
-            description = 'Gradle plugin to generate client model'
-            tags.set(['openapi', 'custom', 'generator'])
-        }
-    }
-}
+//gradlePlugin {
+//    website = 'https://github.com/Mizika/gradle-custom-openapi-plugin'
+//    vcsUrl = 'https://github.com/Mizika/gradle-custom-openapi-plugin'
+//    plugins {
+//        openApiCustomGenerator {
+//            id = 'custom.openapi.plugin'
+//            implementationClass = 'custom.openapi.plugin.Plugin'
+//            displayName = 'Gradle Custom OpenApi plugin'
+//            description = 'Gradle plugin to generate client model'
+//            tags.set(['openapi', 'custom', 'generator'])
+//        }
+//    }
+//}
 
 publishing {
     repositories {
